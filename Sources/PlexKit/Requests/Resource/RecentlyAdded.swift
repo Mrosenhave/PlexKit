@@ -23,7 +23,6 @@ public extension Plex.Request {
               ]
         }
 
-        /// - SeeAlso: `ratingKey` property of `MediaItem`.
 
         private let type: PlexMediaType
 
@@ -31,7 +30,7 @@ public extension Plex.Request {
         private let offset: Int
 
         public init(
-          type: Int,
+          type: PlexMediaType,
             count: Int = 25,
             offset: Int = 0
         ) {
