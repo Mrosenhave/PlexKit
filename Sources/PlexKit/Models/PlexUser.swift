@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct PlexUser: Codable {
+public struct PlexUser: Codable, Hashable {
     public let id: Int
     public let uuid: String
     public let email: String?
@@ -39,7 +39,7 @@ public struct PlexUser: Codable {
      }
      */
 
-    public struct Subscription: Codable {
+    public struct Subscription: Codable, Hashable {
         public let active: Bool
         public let status: String
         public let plan: String?

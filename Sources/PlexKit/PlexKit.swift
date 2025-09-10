@@ -63,6 +63,30 @@ public final class Plex {
         return task
     }
 
+    @discardableResult public func request<Request: PlexDiscoverRequest>(
+        _ request: Request,
+        token: String? = nil,
+        completion: @escaping (Result<Request.Response, PlexError>) -> Void
+    ) -> URLSessionTask? {
+        let urlRequest: URLRequest
+
+        do {
+            urlRequest = try request.asURLRequest(using: token)
+        } catch let error as PlexError {
+            completion(.failure(error))
+            return nil
+        } catch {
+            completion(.failure(.invalidRequest(.unknown(error))))
+            return nil
+        }
+
+        return self.request(
+            urlRequest,
+            transformer: Request.response(from:),
+            completion: completion
+        )
+    }
+  
     @discardableResult public func request<Request: PlexServiceRequest>(
         _ request: Request,
         token: String? = nil,

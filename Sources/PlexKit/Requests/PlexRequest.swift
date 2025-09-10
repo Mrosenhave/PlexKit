@@ -100,3 +100,27 @@ public extension PlexServiceRequest {
         return request
     }
 }
+
+/// Describes a request to the discover.provider.plex.tv service.
+public protocol PlexDiscoverRequest: BasePlexRequest {
+    func asURLRequest(using token: String?) throws -> URLRequest
+}
+
+public extension PlexDiscoverRequest {
+    func asURLRequest(using token: String?) throws -> URLRequest {
+        let path = "https://discover.provider.plex.tv/\(self.path)"
+        guard let url = URL(string: path)?.appendingQueryItems(queryItems ?? []) else {
+            throw PlexError.invalidRequest(.invalidURL(path))
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = httpMethod
+        request.addValue(accept, forHTTPHeaderField: "accept")
+
+        if let token = token {
+            request.addValue(token, forHTTPHeaderField: "X-Plex-Token")
+        }
+
+        return request
+    }
+}

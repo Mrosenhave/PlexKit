@@ -29,7 +29,9 @@ public struct PlexMediaItem: PlexMediaItemType {
     public let parentGuid: String?
     public let grandparentGuid: String?
     public let librarySectionID: Int?
+    public let editionTitle: String?
     public let type: PlexMediaType
+    public let subtype: PlexMediaType?
     public let title: String?
     public let titleSort: String?
     public let grandparentKey: String?
@@ -54,6 +56,7 @@ public struct PlexMediaItem: PlexMediaItemType {
     public let updatedAt: Date?
     public let originalTitle: String?
     public let rating: Double?
+    public let audienceRating: Double?
     public let userRating: Double?
     public let lastRatedAt: Date?
     public let year: Int?
@@ -79,8 +82,89 @@ public struct PlexMediaItem: PlexMediaItemType {
     private let Mood: [Tag]?
     private let Director: [Tag]?
     private let Writer: [Tag]?
-    private let Role: [Tag]?
+  
+  // custom
+  private let Role: [TagRole]?
+  public var roles: [TagRole] { Role ?? [] }
+  
+  private let OnDeck: SingleItemMetadata?
+  public var onDeck: SingleItemMetadata? { OnDeck }
+  
+  private let Extras: Metadata?
+  public var extras: Metadata? { Extras }
+  
+  private let Image: [ItemImage]?
+  public var images: [ItemImage]? { Image }
+  
+  private let Field: [ItemField]?
+  public var fields: [ItemField] { Field ?? [] }
+  
+  private let Related: hubs?
+  public var related: hubs? { Related }
+  
+  private let Children: PlexMediaItemChildren?
+  public var children: PlexMediaItemChildren? { Children }
+  
+  private let Chapter: [ChapterItem]?
+  public var chapters: [ChapterItem] { Chapter ?? [] }
+  
+  private let Rating: [ItemRating]?
+  public var ratings: [ItemRating] { Rating ?? [] }
+  
+  private let Review: [ItemReview]?
+  public var reviews: [ItemReview] { Review ?? [] }
+  
+  private let Collection: [Tag]?
+  public var collections: [Tag] { Collection ?? [] }
+  
+  public struct ChapterItem: Codable, Hashable {
+      public let id: Int
+      public let filter: String?
+      public let tag: String?
+      public let index: Int
+      public let startTimeOffset: Int
+      public let endTimeOffset: Int
+      public let thumb: String?
+  }
+  
+  public class PlexMediaItemChildren: Codable, Hashable, Equatable {
+    public let size: Int
+    private let Metadata: [PlexMediaItem]?
 
+    public var metadata: [PlexMediaItem] {
+        Metadata ?? []
+    }
+    // Codable & Hashable stubs:
+    public static func ==(lhs: PlexMediaItemChildren, rhs: PlexMediaItemChildren) -> Bool {
+        lhs.metadata == rhs.metadata
+    }
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(metadata)
+    }
+  }
+  
+  public struct hubs: Codable, Hashable, Equatable {
+    public let hub: [Hub]?
+    enum CodingKeys: String, CodingKey {
+            case hub = "Hub"
+        }
+  }
+  public class Hub: Codable, Hashable, Equatable {
+    public let hubKey, key: String?
+    public let title, type: String
+    private let Metadata: [PlexMediaItem]?
+
+    public var metadata: [PlexMediaItem] {
+        Metadata ?? []
+    }
+    // Codable & Hashable stubs:
+    public static func ==(lhs: Hub, rhs: Hub) -> Bool {
+        lhs.metadata == rhs.metadata
+    }
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(metadata)
+    }
+  }
     // Playlist.
     public let smart: Bool?
     public let playlistType: PlexPlaylistType?
@@ -90,6 +174,74 @@ public struct PlexMediaItem: PlexMediaItemType {
         public let id: Int?
         public let tag: String
     }
+  
+    public struct ItemRating: Codable, Hashable {
+        public let image: String
+      public let value: Double
+        public let type: String
+    }
+  
+  public struct ItemReview: Codable, Hashable {
+    public let id: Int
+    public let tag: String
+    public let text: String
+    public let image: String
+    public let link: URL?
+    public let source: String
+    }
+  
+  public struct ItemImage: Codable, Hashable {
+      public let alt: String
+    public let type: PlexImageType
+      public let url: String
+  }
+  
+  public struct ItemField: Codable, Hashable {
+      public let locked: Bool
+    public let name: PlexFieldType
+  }
+  
+  public struct TagRole: Codable, Hashable {
+      public let id: Int?
+      public let filter: String?
+      public let tag: String
+      public let tagKey: String?
+      public let role: String?
+      public let thumb: String?
+  }
+  
+  public class SingleItemMetadata: Codable, Hashable {
+            private let Metadata: PlexMediaItem?
+
+            public var metadata: PlexMediaItem? {
+                Metadata
+            }
+
+          // Codable & Hashable stubs:
+          public static func ==(lhs: SingleItemMetadata, rhs: SingleItemMetadata) -> Bool {
+              lhs.metadata == rhs.metadata
+          }
+          public func hash(into hasher: inout Hasher) {
+              hasher.combine(metadata)
+          }
+      }
+  public class Metadata: Codable, Hashable {
+    private let Metadata: [PlexMediaItem]?
+    
+    public var size: Int
+    public var metadata: [PlexMediaItem] {
+      Metadata ?? []
+    }
+    
+    // Codable & Hashable stubs:
+    public static func ==(lhs: Metadata, rhs: Metadata) -> Bool {
+      lhs.metadata == rhs.metadata
+    }
+    public func hash(into hasher: inout Hasher) {
+      hasher.combine(metadata)
+    }
+  }
+
 
     public struct Media: Codable, Hashable {
         public let id: Int
@@ -182,7 +334,7 @@ public struct PlexMediaItem: PlexMediaItemType {
             .init(rawValue: streamType)
         }
 
-        public enum StreamType: Hashable {
+      public enum StreamType: Hashable, Equatable {
             /// A video stream.
             case video
             /// An audio stream.
@@ -206,6 +358,16 @@ public struct PlexMediaItem: PlexMediaItemType {
                     self = .lyrics
                 default:
                     self = .unknown(rawValue)
+                }
+            }
+        public static func == (lhs: StreamType, rhs: StreamType) -> Bool {
+                switch (lhs, rhs) {
+                case (.video, .video), (.audio, .audio), (.subtitle, .subtitle), (.lyrics, .lyrics):
+                    return true
+                case let (.unknown(a), .unknown(b)):
+                    return a == b
+                default:
+                    return false
                 }
             }
         }
@@ -240,10 +402,6 @@ public extension PlexMediaItem {
 
     var writers: [Tag] {
         Writer ?? []
-    }
-
-    var roles: [Tag] {
-        Role ?? []
     }
 
     var originallyReleasedAt: Date? {

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct PlexLibrary: Codable {
+public struct PlexLibrary: Codable, Hashable {
     public let key: String
     public let uuid: String
     public let type: PlexMediaType
@@ -32,7 +32,7 @@ public struct PlexLibrary: Codable {
         self.Location
     }
 
-    public struct Location: Codable {
+    public struct Location: Codable, Hashable {
         public let id: Int
         public let path: String
     }

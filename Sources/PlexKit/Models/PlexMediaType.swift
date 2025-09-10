@@ -19,6 +19,13 @@ public enum PlexMediaType: Hashable {
     case trailer
     case comic
     case person
+  
+  case clip
+  case behindTheScenes
+  case deletedScene
+  case featurette
+  case other
+  case sceneOrSample
 
     case artist
     case album
@@ -69,6 +76,18 @@ public enum PlexMediaType: Hashable {
             self = .userPlaylistItem
         case .collection:
             self = .collection
+        case .clip:
+            self = .clip
+        case .behindTheScenes:
+            self = .behindTheScenes
+        case .deletedScene:
+            self = .deletedScene
+        case .featurette:
+            self = .featurette
+        case .other:
+            self = .other
+        case .sceneOrSample:
+            self = .sceneOrSample
         default:
             self = .unknown(rawValue)
         }
@@ -112,6 +131,18 @@ public enum PlexMediaType: Hashable {
             return RawValue.userPlaylistItem.rawValue
         case .collection:
             return RawValue.collection.rawValue
+        case .clip:
+          return RawValue.clip.rawValue
+        case .behindTheScenes:
+          return RawValue.behindTheScenes.rawValue
+        case .deletedScene:
+          return RawValue.deletedScene.rawValue
+        case .featurette:
+          return RawValue.featurette.rawValue
+        case .other:
+          return RawValue.other.rawValue
+        case .sceneOrSample:
+          return RawValue.sceneOrSample.rawValue
         }
     }
 
@@ -123,6 +154,13 @@ public enum PlexMediaType: Hashable {
         case trailer
         case comic
         case person
+      
+      case clip
+      case behindTheScenes
+      case deletedScene
+      case featurette
+      case other
+      case sceneOrSample
 
         case artist
         case album
@@ -152,7 +190,7 @@ extension PlexMediaType: Codable {
 }
 
 extension PlexMediaType {
-    var key: Int {
+    public var key: Int {
         switch self {
         case .unknown:
             return -1
@@ -191,6 +229,15 @@ extension PlexMediaType {
             return 18
         case .userPlaylistItem:
             return 1001
+        case .clip, .behindTheScenes, .deletedScene, .featurette, .other, .sceneOrSample:
+          return 14
+//          Extras have an "extraType" field (subtype | extraType):
+//          behindTheScenes | 5
+//          deletedScene | 2
+//          featurette | 10
+//          other | 12
+//          sceneOrSample | 6
+//          trailer | 1
         }
     }
 }

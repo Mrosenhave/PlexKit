@@ -26,6 +26,10 @@ public extension Plex.Request {
                 .init(name: "includeChapters", value: includeChapters),
                 .init(name: "includeStations", value: includeStations),
                 .init(name: "includeExternalMedia", value: includeExternalMedia),
+                .init(name: "includeRelated", value: includeRelated),
+                .init(name: "includeRelatedCount", value: includeRelatedCount),
+                .init(name: "includeReviews", value: includeReviews),
+                .init(name: "includeChildren", value: includeChildren),
             ]
         }
 
@@ -40,6 +44,10 @@ public extension Plex.Request {
         private let includeChapters: Bool
         private let includeStations: Bool
         private let includeExternalMedia: Bool
+        private let includeRelated: Bool
+        private let includeRelatedCount: Int
+        private let includeReviews: Bool
+        private let includeChildren: Bool
 
         public init(
             ratingKey: String,
@@ -50,7 +58,11 @@ public extension Plex.Request {
             includePreferences: Bool = false,
             includeChapters: Bool = false,
             includeStations: Bool = false,
-            includeExternalMedia: Bool = false
+            includeExternalMedia: Bool = false,
+            includeRelated: Bool = false,
+            includeRelatedCount: Int = 15,
+            includeReviews: Bool = false,
+            includeChildren: Bool = false
         ) {
             self.ratingKey = ratingKey
             self.includeConcerts = includeConcerts
@@ -61,6 +73,10 @@ public extension Plex.Request {
             self.includeChapters = includeChapters
             self.includeStations = includeStations
             self.includeExternalMedia = includeExternalMedia
+          self.includeRelated = includeRelated
+          self.includeRelatedCount = includeRelatedCount
+          self.includeReviews = includeReviews
+          self.includeChildren = includeChildren
         }
 
         public struct Response: Codable {
